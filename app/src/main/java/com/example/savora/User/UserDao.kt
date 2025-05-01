@@ -1,4 +1,4 @@
-package com.example.savora
+package com.example.savora.User
 
 import androidx.room.*
 

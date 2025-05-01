@@ -1,15 +1,20 @@
-package com.example.savora
+package com.example.savora.User
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.ViewModelProvider
+import com.example.savora.AppDatabase
+import com.example.savora.MainActivity
+import com.example.savora.R
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class LoginRegisterActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
 
     private lateinit var usernameInput: EditText
     private lateinit var passwordInput: EditText
@@ -30,7 +35,7 @@ class LoginRegisterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login_register)
+        setContentView(R.layout.activity_login)
 
         usernameInput = findViewById(R.id.etUsername)
         passwordInput = findViewById(R.id.etPassword)
@@ -39,15 +44,22 @@ class LoginRegisterActivity : AppCompatActivity() {
         resultText = findViewById(R.id.tvResult)
 
         // Observing login result
-        lifecycleScope.launch {
-            viewModel.loginResult.collectLatest { success ->
-                if (success == true) {
-                    resultText.text = "Login Successful!"
-                } else if (success == false) {
-                    resultText.text = "Login Failed. Check credentials."
+        try {
+            lifecycleScope.launch {
+                viewModel.loginResult.collectLatest { success ->
+                    if (success == true) {
+                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                            startActivity(intent)
+                    } else if (success == false) {
+                        resultText.text = "Login Failed. Check credentials."
+                    }
                 }
             }
+        }catch (e: Exception) {
+            Log.e("LoginActivity", "Error during login", e)
+            Toast.makeText(this, "An error occurred: ${e.message}", Toast.LENGTH_SHORT).show()
         }
+
 
         // Handling login
         loginButton.setOnClickListener {
@@ -61,19 +73,11 @@ class LoginRegisterActivity : AppCompatActivity() {
             }
         }
 
-        // Handling register
+        // Navigates to register page
         registerButton.setOnClickListener {
-            val username = usernameInput.text.toString()
-            val password = passwordInput.text.toString()
-
-            if (username.isNotBlank() && password.isNotBlank()) {
-                viewModel.onEvent(UserEvent.SetUserName(username))
-                viewModel.onEvent(UserEvent.SetPassword(password))
-                viewModel.onEvent(UserEvent.SaveUser)
-                Toast.makeText(this, "User Registered!", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Please fill both fields", Toast.LENGTH_SHORT).show()
-            }
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
         }
+
     }
 }

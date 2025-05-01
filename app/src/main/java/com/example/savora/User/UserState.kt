@@ -1,4 +1,4 @@
-package com.example.savora
+package com.example.savora.User
 
 data class UserState(
     val users: List<User> = emptyList(),
@@ -6,4 +6,4 @@ data class UserState(
     val password: String = "",
     val isAddingUser: Boolean =false,
 
-)
+    )

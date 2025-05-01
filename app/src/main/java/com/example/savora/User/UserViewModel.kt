@@ -1,4 +1,4 @@
-package com.example.savora
+package com.example.savora.User
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,19 +52,19 @@ class UserViewModel(private val dao: UserDao): ViewModel()
              val username = _state.value.username
              val password = _state.value.password
 
-             if(username.isBlank() || password.isBlank())
-             { return
+             if (username.isBlank() || password.isBlank()) {
+                 return
              }
 
              val user = User(
-                 username =username,
+                 username = username,
                  password = password
              )
 
              viewModelScope.launch { dao.insert(user) }
-             _state.update { it.copy(isAddingUser = false, username ="", password = "") }
-         }
+             _state.update { it.copy(isAddingUser = false, username = "", password = "") }
 
+         }
        }
 
     }
