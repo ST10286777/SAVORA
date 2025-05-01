@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
@@ -261,53 +262,68 @@ class AddTransactionActivity : AppCompatActivity()
     }
 
     private fun saveTransaction() {
-        val amountText = etAmount.text.toString()
-        val description = etDescription.text.toString()
-        val categoryName = spinnerCategory.selectedItem?.toString()
+        try {
+            // Retrieve and validate input fields
+            val amountText = etAmount.text.toString()
+            val description = etDescription.text.toString()
+            val categoryName = spinnerCategory.selectedItem?.toString()
 
-        // Validate input
-        if (amountText.isBlank() || categoryName.isNullOrBlank()) {
-            Toast.makeText(this, "Please enter an amount and select a category.", Toast.LENGTH_SHORT).show()
-            return
+            // Validate input fields
+            if (amountText.isBlank() || categoryName.isNullOrBlank()) {
+                Toast.makeText(this, "Please enter an amount and select a category.", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            // Parse amount
+            val amount = amountText.toDoubleOrNull()
+            if (amount == null || amount <= 0) {
+                Toast.makeText(this, "Please enter a valid amount.", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            // Get categoryId from categoryMap
+            val categoryId = categoryMap[categoryName]
+            if (categoryId == null) {
+                Toast.makeText(this, "Selected category not found.", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            // Get userId
+            val userId = getCurrentUserId()
+
+            // Retrieve start and end times from ViewModel state
+            val startTime = viewModel.state.value.startTime
+            val endTime = viewModel.state.value.endTime
+
+            // Validate that endTime is after startTime
+            if (startTime.after(endTime)) {
+                Toast.makeText(this, "End time must be after start time", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            // Dispatch events to update ViewModel state
+            viewModel.onEvent(TransactionEvent.SetUserId(userId))
+            viewModel.onEvent(TransactionEvent.SetCategoryId(categoryId))
+            viewModel.onEvent(TransactionEvent.SetAmount(amount))
+            viewModel.onEvent(TransactionEvent.SetDescription(description))
+            viewModel.onEvent(TransactionEvent.SetDate(Date(selectedDateMillis)))
+            viewModel.onEvent(TransactionEvent.SetStartTime(startTime))
+            viewModel.onEvent(TransactionEvent.SetEndTime(endTime))
+            viewModel.onEvent(TransactionEvent.SetReceiptPhoto(receiptUri))
+
+            // Trigger the save action
+            viewModel.onEvent(TransactionEvent.SaveTransaction)
+
+            // Inform the user that the transaction has been saved
+            Toast.makeText(this, "Transaction saved successfully.", Toast.LENGTH_SHORT).show()
+
+        } catch (e: Exception) {
+            Log.e("saveTransaction", "Failed to save transaction: ${e.message}", e)
+            Toast.makeText(this, "An error occurred while saving the transaction.", Toast.LENGTH_LONG).show()
         }
-
-        val amount = amountText.toDoubleOrNull()
-        if (amount == null || amount <= 0) {
-            Toast.makeText(this, "Please enter a valid amount.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val categoryId = categoryMap[categoryName]
-        if (categoryId == null) {
-            Toast.makeText(this, "Selected category not found.", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val userId = getCurrentUserId()
-
-        // Dispatch events to update ViewModel state
-        viewModel.onEvent(TransactionEvent.SetUserId(userId))
-        viewModel.onEvent(TransactionEvent.SetAmount(amount))
-        viewModel.onEvent(TransactionEvent.SetDescription(description))
-        viewModel.onEvent(TransactionEvent.SetCategory(categoryName))
-        viewModel.onEvent(TransactionEvent.SetDate(Date(selectedDateMillis)))
-
-        val startTime = viewModel.state.value.startTime
-        val endTime = viewModel.state.value.endTime
-        if (startTime.after(endTime)) {
-            Toast.makeText(this, "End time must be after start time", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        viewModel.onEvent(TransactionEvent.SetStartTime(startTime))
-        viewModel.onEvent(TransactionEvent.SetEndTime(endTime))
-        viewModel.onEvent(TransactionEvent.SetReceiptPhoto(receiptUri))
-
-        // Trigger the save action
-        viewModel.onEvent(TransactionEvent.SaveTransaction)
-
-        Toast.makeText(this, "Transaction saved successfully.", Toast.LENGTH_SHORT).show()
     }
+
+
 
 
 }

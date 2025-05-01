@@ -12,7 +12,7 @@ import com.example.savora.category.CategoryDao
 import com.example.savora.transaction.Transaction
 import com.example.savora.transaction.TransactionDao
 
-@Database(entities = [User::class, Category::class, Transaction::class], version = 2)
+@Database(entities = [User::class, Category::class, Transaction::class], version = 3)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun UserDao(): UserDao
@@ -29,8 +29,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "savora_database"
-                )
-                    .fallbackToDestructiveMigration()
+                )//.fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 instance

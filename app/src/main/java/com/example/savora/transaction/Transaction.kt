@@ -2,6 +2,7 @@ package com.example.savora.transaction
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.example.savora.User.User
 import com.example.savora.category.Category
@@ -37,6 +38,5 @@ data class Transaction(
     val startTime: Date,
     val endTime: Date,
     val receiptPhoto: String? = null,
-    val category: String
 )
 

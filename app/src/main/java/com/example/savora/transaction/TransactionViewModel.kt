@@ -21,10 +21,6 @@ class TransactionViewModel(private val dao: TransactionDao) : ViewModel() {
                 }
             }
 
-            is TransactionEvent.SetCategory -> {
-                _state.update { it.copy(category = event.category) }
-            }
-
             is TransactionEvent.SetUserId -> {
                 _state.update { it.copy(userId = event.userId) }
             }
@@ -63,7 +59,7 @@ class TransactionViewModel(private val dao: TransactionDao) : ViewModel() {
 
             TransactionEvent.SaveTransaction -> {
                 val currentState = _state.value
-                if (currentState.amount <= 0 || currentState.category.isBlank()) return
+                if (currentState.amount <= 0 || currentState.categoryId == 0) return
 
                 val transaction = Transaction(
                     userId = currentState.userId,
@@ -74,7 +70,6 @@ class TransactionViewModel(private val dao: TransactionDao) : ViewModel() {
                     startTime = currentState.startTime,
                     endTime = currentState.endTime,
                     receiptPhoto = currentState.receiptPhoto,
-                    category = currentState.category
                 )
 
                 viewModelScope.launch {
@@ -82,7 +77,7 @@ class TransactionViewModel(private val dao: TransactionDao) : ViewModel() {
                 }
 
                 _state.update {
-                    it.copy(userId = 0, amount = 0.0, date = Date(), description = "", category = "",
+                    it.copy(userId = 0, amount = 0.0, date = Date(), description = "",
                         categoryId = 0, startTime = Date(), endTime = Date(), receiptPhoto = null,
                         isAddingTransaction = false)
                 }

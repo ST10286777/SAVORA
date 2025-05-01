@@ -9,7 +9,6 @@ data class TransactionState(
     val amount: Double = 0.0,
     val date: Date = Date(), // Default to current Date
     val description: String = "",
-    val category: String = "",
     val categoryId: Int = 0,
     val startTime: Date = Date(),  // Default to current time
     val endTime: Date = Date(System.currentTimeMillis() + 3600000), // Default +1 hour
