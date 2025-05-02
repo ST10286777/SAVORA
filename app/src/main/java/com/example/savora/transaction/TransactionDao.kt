@@ -20,8 +20,8 @@ interface TransactionDao {
     @Query("SELECT SUM(amount) FROM transaction_table")
     fun getTotalExpensesAmount(): Float
 
- @Query("SELECT * FROM transaction_table ORDER BY date ASC")
-  suspend fun getAllTransactions(): List<Transaction>
+    @Query("SELECT * FROM transaction_table WHERE userId = :userId ORDER BY date ASC")
+    suspend fun getAllTransactions(userId: Int): List<Transaction>
 
     @Delete
     suspend fun delete(transaction: Transaction)

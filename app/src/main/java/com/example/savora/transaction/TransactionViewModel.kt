@@ -13,8 +13,20 @@ class TransactionViewModel(private val dao: TransactionDao) : ViewModel() {
     private val _state = MutableStateFlow(TransactionState())
     val state: StateFlow<TransactionState> = _state
 
+
     fun onEvent(event: TransactionEvent) {
         when (event) {
+
+            is TransactionEvent.GetAllTransactions -> {
+                viewModelScope.launch {
+                    val userTransactions = dao.getAllTransactions(event.userId)
+                    _state.value = _state.value.copy(
+                        transactions = userTransactions,
+                        userId = event.userId
+                    )
+                }
+            }
+
             is TransactionEvent.DeleteTransaction -> {
                 viewModelScope.launch {
                     dao.delete(event.transaction)

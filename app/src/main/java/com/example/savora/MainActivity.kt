@@ -8,6 +8,7 @@ import android.widget.Button
 import com.example.savora.User.LoginActivity
 import com.example.savora.category.CategoryActivity
 import com.example.savora.transaction.AddTransactionActivity
+import com.example.savora.transaction.DisplayTransactionsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
@@ -37,7 +38,9 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 R.id.nav_expenses -> {
-                    // Load Dashboard
+                    // Loads DisplayTransactionsActivity
+                    val intent = Intent(this, DisplayTransactionsActivity::class.java)
+                    startActivity(intent)
                     true
                 }
 
@@ -51,7 +54,7 @@ class MainActivity : AppCompatActivity() {
                     val intent = Intent(this, AddTransactionActivity::class.java)
                     startActivity(intent)
                     true
-                    true
+
                 }
 
                 R.id.nav_profile -> {

@@ -16,5 +16,6 @@ interface TransactionEvent
     object ShowDialog: TransactionEvent
     object HideDialog: TransactionEvent
     data class  DeleteTransaction(val transaction: Transaction): TransactionEvent
+    data class GetAllTransactions(val userId: Int) : TransactionEvent
 
 }
